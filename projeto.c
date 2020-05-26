@@ -4,13 +4,6 @@
 #include<locale.h>
 #include<string.h>
 
-void input(char *string,int length)
-{
-    fgets(string,length,stdin);
-    while(*string++ != '\n')
-        ;
-    *--string = '\0';
-}
 
 typedef struct elemento{
     int id;
@@ -19,7 +12,7 @@ typedef struct elemento{
     struct elemento *prox;
 }Elemento;
 
-Elemento* listaGeral; //cria a lista geral de itens
+Elemento* listaGeral; //lista geral de itens
 
 //função para criar a lista: retorna uma lista vazia
 Elemento* criar_lista(void){
@@ -74,8 +67,19 @@ int tamanho_lista(Elemento *lista){
     return i;
 }
 
-int deleta_no(Elemento **primeiro_no, int id)
+void deleta_no(Elemento **primeiro_no, int id)
 {
+//    Elemento *temp = (Elemento*)malloc(sizeof(Elemento));
+//    Elemento* p;
+//
+//    for(p = lista; p != NULL; p = p -> prox){
+//        if(p->id == id){
+//            temp = p;
+//            p = p->prox;
+//            free(temp);
+//        }
+//    }
+
     Elemento* temp = *primeiro_no, *anterior;
 
     if (temp != NULL && temp->id == id)
@@ -95,9 +99,9 @@ int deleta_no(Elemento **primeiro_no, int id)
 
     anterior->prox = temp->prox;
 
-    free(temp);  // Libera memória
+    free(temp);
 
-    return 1;
+    return;
 }
 
 
@@ -294,17 +298,18 @@ void menuExclusao(){
         float valor;
         int resultado=0;
 
-        for(p = listaGeral; p != NULL; p = p -> prox){
-            if(p->id == id){
-                achou = 1;
-                resultado = deleta_no(&p,p->id);
-            }
-        }
-        if(!achou){
-            printf("\n*********************************************");
-            printf("\nNão foi encontrado nenhum item com o id %d.", id);
-            printf("\n*********************************************\n");
-        }
+        //for(p = listaGeral; p != NULL; p = p -> prox){
+            //if(p->id == id){
+                //achou = 1;
+                //resultado = deleta_no(&p,p->id);
+                deleta_no(&listaGeral,id);
+            //}
+        //}
+//        if(!achou){
+//            printf("\n*********************************************");
+//            printf("\nNão foi encontrado nenhum item com o id %d.", id);
+//            printf("\n*********************************************\n");
+//        }
 
         printf("\nDeseja realizar outra busca? (s/n) ");
         scanf("%s", &op);
@@ -334,6 +339,9 @@ void menuPrincipal(){
         printf("6 - SAIR DO SISTEMA\n");
         printf("---------------------------------------------------\n");
 
+        scanf("%d", &op);
+        getchar();
+
         switch(op){
             case 1:
                 menuCadastro();
@@ -353,8 +361,7 @@ void menuPrincipal(){
             case 6:
                 exit(0);
         }
-        scanf("%d", &op);
-        getchar();
+
     }while(op!=6);
 }
 

@@ -4,7 +4,7 @@
 #include<locale.h>
 #include<string.h>
 
-
+//novo comentario
 typedef struct elemento{
     int id;
     char descricao[100];

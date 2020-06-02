@@ -69,17 +69,6 @@ int tamanho_lista(Elemento *lista){
 
 void deleta_no(Elemento **primeiro_no, int id)
 {
-//    Elemento *temp = (Elemento*)malloc(sizeof(Elemento));
-//    Elemento* p;
-//
-//    for(p = lista; p != NULL; p = p -> prox){
-//        if(p->id == id){
-//            temp = p;
-//            p = p->prox;
-//            free(temp);
-//        }
-//    }
-
     Elemento* temp = *primeiro_no, *anterior;
 
     if (temp != NULL && temp->id == id)
@@ -102,6 +91,67 @@ void deleta_no(Elemento **primeiro_no, int id)
     free(temp);
 
     return;
+}
+
+void salvar_no_arquivo(Elemento *lista){
+    FILE *f;
+
+    f = fopen("arquivo.txt","w+");
+
+    Elemento *p;
+
+    for(p = lista; p != NULL; p = p -> prox){
+        fprintf(f,"%d\n", p->id);
+        fprintf(f,"%s", p->descricao);
+        fprintf(f,"%.2f\n", p->valor);
+        fprintf(f,"@\n");
+    }
+
+    fclose(f);
+}
+
+void carregar_do_arquivo(){
+    system("clear||cls");
+
+    FILE *f;
+    size_t len = 255;
+    char *line = malloc(sizeof(char) * len);
+
+    f = fopen("arquivo.txt","r");
+
+    if (f == NULL){
+        printf("Could not open file");
+        return;
+    }
+
+    free(listaGeral);
+    listaGeral = criar_lista();
+
+    int aux=0;
+    int id;
+    char descricao[200];
+    float valor;
+
+    while (fgets(line, len, f) != NULL){
+        if (!strcmp(line,"@\n")==0){
+                if(aux==0)
+                    //id = (int)*line;
+                    id = atoi(line);
+                else if(aux==1)
+                    strcpy(descricao,line);
+                else if(aux==2)
+                    //valor = (float)*line;
+                    valor = atof(line);
+            aux++;
+            //printf("%d %d %s %.2f\n",aux,id,descricao,valor);
+        }else if(strcmp(line,"@\n")==0){
+            aux=0;
+            listaGeral = inserir_no(listaGeral, id, descricao, valor);
+        }
+    }
+
+    free(line);
+    fclose(f);
 }
 
 
@@ -298,18 +348,15 @@ void menuExclusao(){
         float valor;
         int resultado=0;
 
-        //for(p = listaGeral; p != NULL; p = p -> prox){
-            //if(p->id == id){
-                //achou = 1;
-                //resultado = deleta_no(&p,p->id);
-                deleta_no(&listaGeral,id);
-            //}
-        //}
-//        if(!achou){
-//            printf("\n*********************************************");
-//            printf("\nNão foi encontrado nenhum item com o id %d.", id);
-//            printf("\n*********************************************\n");
-//        }
+        deleta_no(&listaGeral,id);
+
+        if(tamanho_lista(listaGeral) > 0){
+            printf("\nListagem de itens atualizada:\n");
+            imprimir_lista(listaGeral);
+
+        }else{
+            printf("\nNão existem registros cadastrados.\n");
+        }
 
         printf("\nDeseja realizar outra busca? (s/n) ");
         scanf("%s", &op);
@@ -336,7 +383,9 @@ void menuPrincipal(){
         printf("3 - DETALHAR ITEM;\n");
         printf("4 - ALTERAR ITEM;\n");
         printf("5 - EXCLUIR ITEM;\n");
-        printf("6 - SAIR DO SISTEMA\n");
+        printf("6 - SALVAR ESTOQUE\n");
+        printf("7 - CARREGAR ESTOQUE\n");
+        printf("8 - SAIR DO SISTEMA\n");
         printf("---------------------------------------------------\n");
 
         scanf("%d", &op);
@@ -359,10 +408,16 @@ void menuPrincipal(){
                 menuExclusao();
                 break;
             case 6:
+                salvar_no_arquivo(listaGeral);
+                break;
+            case 7:
+                carregar_do_arquivo();
+                break;
+            case 8:
                 exit(0);
         }
 
-    }while(op!=6);
+    }while(op!=8);
 }
 
 int main(void){
